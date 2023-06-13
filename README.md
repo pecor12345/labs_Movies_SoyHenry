@@ -38,7 +38,7 @@ Licencia
 Este proyecto se encuentra bajo la Licencia MIT.
 
 Contacto
-Si tienes alguna pregunta o sugerencia sobre este proyecto, no dudes en contactarme a través de mi correo electrónico: tu-email@example.com.
+Si tienes alguna pregunta o sugerencia sobre este proyecto, no dudes en contactarme a través de mi correo electrónico: pe.cor.12345@gmail.com.
 
 ¡Gracias por tu interés en este proyecto! Espero que sea de utilidad.
 
