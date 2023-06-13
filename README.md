@@ -1,6 +1,6 @@
 # labs_Movies_SoyHenry
 
-<p align=center><img src=D:\SOYHENRY\src\moviees.png><p>
+<p align=center><img src=_src/moviees.png><p>
 
 
 
