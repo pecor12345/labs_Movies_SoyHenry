@@ -1,25 +1,8 @@
+import pandas as pd
 from fastapi import FastAPI 
-import pandas as pd 
-import uvicorn 
-import os
-import sys
-import time
-import json
-import requests
-import urllib3
-import logging
-import argparse
-import traceback
-import re
-import random
-import string
-import datetime
-import threading
-import queue
-import concurrent.futures
-import urllib.parse
-import urllib.request
-import urllib.error
+
+
+
 #                                           MODULO API
 app = FastAPI()
 
@@ -36,14 +19,14 @@ async def cantidad_filmaciones_mes(mes: str):
         cantidad = df_labs[df_labs['release_date'].dt.month == mes_num].shape[0]
     else:
         mes = mes.lower()
-        meses_nombres = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-                         'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+        meses_nombres = {'enero': 1, 'febrero': 2, 'marzo' : 3, 'abril' : 4, 'mayo': 5, 'junio': 6,
+                         'julio' : 7, 'agosto' : 8, 'septiembre' : 9, 'octubre' : 10, 'noviembre' : 11, 'diciembre' : 12}
         if mes in meses_nombres:
             mes_num = meses_nombres.index(mes) + 1
             cantidad = df_labs[df_labs['release_date'].dt.month == mes_num].shape[0]
         else:
             return {"Error. No hay información. Revise el mes ingresado por favor."}
-    return {"En el mes de ": mes, " fueron estrenadas la siguiente cantidad de peliculas:": cantidad}
+    return {f"En el mes de ": mes, " fueron estrenadas la siguiente cantidad de peliculas:": cantidad}
 
 #Función 02: CANTIDAD DE FILMACIONES POR DÍA
 @app.get("/cantidad_filmaciones_dia/{dia}")
@@ -132,7 +115,7 @@ async def nombre_director(director: str):
         return {"Error. Director no encontrado"}
     else:
         resultados = []
-        for _, pelicula in peliculas_del_directo.iterrows():
+        for _, pelicula in peliculas_del_director.iterrows():
             resultados.append({
                 "titulo": str(pelicula['title']),
                 "anio": str(pelicula['release_year']),
@@ -158,7 +141,7 @@ df_labs['features'] = df_labs['genres'].astype(str) + ' ' + df_labs['vote_averag
 
 # Crear a TF-IDF matrix para caracteristicas combinadas
 tfidf = TfidfVectorizer()
-tfidf_matrix = tfidf.fit_transform(df_combined['features'])
+tfidf_matrix = tfidf.fit_transform(df_labs['features'])
 
 #Definiendo la función de Recomendación
 def recomendacion(titulo):
@@ -177,7 +160,7 @@ def recomendacion(titulo):
 # Ranking de peliculas parecidas
     similar_movies_indices = similarity_scores.argsort()[0][::-1]
     similar_movies_indices = similar_movies_indices[similar_movies_indices != index]
-    peliculas_similares = df_combined.iloc[similar_movies_indices][:5][['title', 'vote_average']].values.tolist()
+    peliculas_similares = df_labs.iloc[similar_movies_indices][:5][['title', 'vote_average']].values.tolist()
 #Peliculas con alta valoración
     peliculas_similares = sorted(peliculas_similares, key=lambda x: x[1], reverse=True)
     while len(peliculas_similares) < 5:
@@ -193,21 +176,14 @@ async def obtener_recomendacion(titulo: str):
         return {"Error": "Película no encontrada"}
     else:
         return {"lista_recomendada": recomendaciones}
-
-
-
     
+@app.get("/dataframe")
+def get_dataframe():
+   data = df_labs
+   return JSONResponse(content=data.to_json(orient='records'), media_type='application/json')
 
+import nest_asyncio
+nest_asyncio.apply()#import uvicorn
 
-                         
-                         
-           
-                      
-        
-
-            
-                        
-
-        
-                
-    
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8000)
