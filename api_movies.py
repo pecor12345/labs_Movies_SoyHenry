@@ -130,54 +130,8 @@ async def nombre_director(director: str):
             "retorno_total_director": str(retorno_total),
             "peliculas": resultados
             }
-    
-#importar funciones
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer 
-
-#Limpiar datos, crear caracteristicas y combinar colunmas
-df_labs['genres'] = df_labs['genres'].fillna('')
-df_labs['features'] = df_labs['genres'].astype(str) + ' ' + df_labs['vote_average'].astype(str)
-
-# Crear a TF-IDF matrix para caracteristicas combinadas
-tfidf = TfidfVectorizer()
-tfidf_matrix = tfidf.fit_transform(df_labs['features'])
-
-#Definiendo la función de Recomendación
-def recomendacion(titulo):
-    titulo = titulo.lower()
-    pelicula_seleccionada = df_labs[df_labs['title'].str.lower() == titulo]
-
-    if pelicula_seleccionada.empty:
-        return []
-
- #Filtrar peliculas por titulo   
-    index = pelicula_seleccionada.index[0]
-#Obtener el ID de la pelicula seleccionada
-    id_pelicula_seleccionada = pelicula_seleccionada.iloc
-# calcular la similitud entre peliculas 
-    similarity_scores = cosine_similarity(tfidf_matrix[index], tfidf_matrix)
-# Ranking de peliculas parecidas
-    similar_movies_indices = similarity_scores.argsort()[0][::-1]
-    similar_movies_indices = similar_movies_indices[similar_movies_indices != index]
-    peliculas_similares = df_labs.iloc[similar_movies_indices][:5][['title', 'vote_average']].values.tolist()
-#Peliculas con alta valoración
-    peliculas_similares = sorted(peliculas_similares, key=lambda x: x[1], reverse=True)
-    while len(peliculas_similares) < 5:
-        peliculas_similares.append(['Película adicional', 0])
-
-    return peliculas_similares
-
- #Crear una función para recomendar películas
-@app.get("/recomendacion/{titulo}")
-async def obtener_recomendacion(titulo: str):
-    recomendaciones = recomendacion(titulo)
-    if len(recomendaciones) == 0:
-        return {"Error": "Película no encontrada"}
-    else:
-        return {"lista_recomendada": recomendaciones}
-    
-@app.get("/dataframe")
+        
+'''@app.get("/dataframe")
 def get_dataframe():
    data = df_labs
    return JSONResponse(content=data.to_json(orient='records'), media_type='application/json')
@@ -186,4 +140,4 @@ import nest_asyncio
 nest_asyncio.apply()#import uvicorn
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host='0.0.0.0', port=8000)'''
